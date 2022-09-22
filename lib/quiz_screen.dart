@@ -306,7 +306,7 @@ class _QuizState extends State<Quiz> {
                       child: Row(
                         children: [
                           Text("Points"),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           ),
                           customTextField(
