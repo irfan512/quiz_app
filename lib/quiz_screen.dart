@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_app/Utils/custom_widgets.dart';
+import 'package:quiz_app/models/quiz_list_model.dart';
 import 'package:quiz_app/proceed_screen.dart';
+import 'package:quiz_app/text_editor.dart';
 
 import 'Utils/advance_tile.dart';
 import 'Utils/timer_tile.dart';
@@ -32,11 +34,10 @@ class _QuizState extends State<Quiz> {
     'image',
     'audio',
   ];
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    List<Widget> _contatos =
-        new List.generate(_count, (int i) => questionContainer());
 
     return SafeArea(
       child: Scaffold(
@@ -114,7 +115,29 @@ class _QuizState extends State<Quiz> {
 
 // Question Container
                 Column(
-                  children: _contatos,
+                  children: [
+                    if (quizList!.isNotEmpty)
+                      for (QuizListModel data in quizList!)
+                        Card(
+                          child: ListTile(
+                            title: Text(data.questionTitle!),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(data.type!),
+                                IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        quizList!.remove(data);
+                                      });
+                                    },
+                                    icon: Icon(Icons.delete))
+                              ],
+                            ),
+                          ),
+                        ),
+                    questionContainer(),
+                  ],
                 ),
 
                 // IconButton Row
@@ -218,9 +241,35 @@ class _QuizState extends State<Quiz> {
     );
   }
 
+  QuizListModel? quiz;
+
+  List<QuizListModel>? quizList = [];
+
   void addNewContainer() {
+    _count++;
+    quiz ??= QuizListModel.fromJson({
+      "questionNo": _count,
+      "type": "MCQ",
+      "duration": "87328",
+      "points": 10,
+      "questionTitle": "arham",
+      "mediaType": "image",
+      "options": [
+        {"option1": ""},
+        {"option2": ""}
+      ],
+      "advanceSetting": {
+        "feedback": "asdhgasj",
+        "negitivePoints": 1,
+        "isSkip": false
+      }
+    });
+
+    quizList!.add(quiz!);
+    // print(quiz!.toJson());
+
     setState(() {
-      _count = _count + 1;
+      // _count++;
     });
   }
 
@@ -256,7 +305,7 @@ class _QuizState extends State<Quiz> {
                           SizedBox(
                             width: 10,
                           ),
-                          Text("Question 1"),
+                          Text("Question $_count"),
                         ],
                       ),
                     ),
@@ -346,24 +395,9 @@ class _QuizState extends State<Quiz> {
               SizedBox(
                 height: 10,
               ),
-              SizedBox(
-                height: 30,
-                width: size.width * 0.6,
-                child: TextField(
-                  style: TextStyle(fontSize: 13),
-                  keyboardType: TextInputType.name,
-                  cursorColor: Colors.black,
-                  decoration: InputDecoration(
-                    hintText: "Question text",
-                    hintStyle: TextStyle(fontSize: 13),
-                    contentPadding: EdgeInsets.only(bottom: 13, left: 3),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(4)),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(4)),
-                  ),
-                ),
-              ),
+
+              TextEditor(),
+
               SizedBox(
                 height: 20,
               ),
